@@ -1,0 +1,40 @@
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Web Scraping
+beautifulsoup4==4.12.3
+requests==2.31.0
+lxml==5.1.0
+selenium==4.16.0
+undetected-chromedriver>=3.5.5
+
+# Database
+pymongo==4.6.1
+motor==3.3.2
+
+# NLP and Text Processing
+spacy==3.7.2
+sentence-transformers==2.3.1
+numpy==1.26.3
+scikit-learn==1.4.0
+
+# Geocoding
+googlemaps==4.10.0
+
+# Utils
+python-dotenv==1.0.0
+APScheduler==3.10.4
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Date/Time
+python-dateutil==2.8.2
+
+# CORS
+fastapi-cors==0.0.6
+
+# Testing
+pytest==8.3.5
+pytest-asyncio==0.25.3

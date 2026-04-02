@@ -1,0 +1,1 @@
+C:\Users\ugurs\OneDrive\Masaüstü\kentsel-haber-scraper\backend\.venv\Scripts\python.exe: can't open file 'C:\\Users\\ugurs\\OneDrive\\Masaüstü\\kentsel-haber-scraper\\backend\\backend\\main.py': [Errno 2] No such file or directory
