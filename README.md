@@ -1,4 +1,4 @@
-# 🗺️ Kentsel Haber Scraper
+﻿# 🗺️ Kentsel Haber Scraper
 
 Web Scraping Tabanlı Kentsel Haber İzleme ve Harita Üzerinde Görselleştirme Sistemi
 
@@ -225,10 +225,6 @@ DEFAULT_STADIUM_RADIUS_KM=3.0
 ```
 
 Bu değerler frontend filtre paneline `/api/news/meta` üzerinden otomatik taşınır.
-
-## 👥 Geliştirici
-
-[Adını buraya ekle]
 
 ## 📅 Teslim Tarihi
 
