@@ -61,7 +61,7 @@
 }
 
 .filters-grid select,
-.filters-grid input {
+.filters-grid input:not([type='checkbox']) {
   width: 100%;
   padding: 10px 11px;
   border: 1px solid #c6cec3;
@@ -69,6 +69,18 @@
   background: #ffffff;
   color: var(--ink);
   font-size: 0.95rem;
+}
+
+.filters-grid .checkbox-label {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.filters-grid .checkbox-label input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
 }
 
 .button-row {

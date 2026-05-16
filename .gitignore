@@ -59,6 +59,16 @@ htmlcov/
 node_modules/
 npm-debug.log
 
+# Proje raporları ve sunum dosyaları
+proje_raporu.html
+docs/
+
+# Geliştirme sırasında kullanılan yardımcı/debug scriptler
+_debug_*.py
+_fix_*.py
+_cleanup_*.py
+_reclassify.py
+
 # React build output
 frontend/build/
 

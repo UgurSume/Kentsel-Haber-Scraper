@@ -10,6 +10,7 @@ import logging
 import hashlib
 import re
 from urllib.parse import urldefrag
+from src.config import DEFAULT_SCRAPE_DAYS
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +127,7 @@ class BaseScraper(ABC):
         combined = f"{title.lower().strip()}{content.lower().strip()}"
         return hashlib.md5(combined.encode('utf-8')).hexdigest()
 
-    def is_within_date_range(self, publish_date: datetime, days: int = 3) -> bool:
+    def is_within_date_range(self, publish_date: datetime, days: int = DEFAULT_SCRAPE_DAYS) -> bool:
         """Check if publish date is within the last N days"""
         if not publish_date:
             return False
@@ -353,7 +354,7 @@ class BaseScraper(ABC):
         return None
 
     @abstractmethod
-    def scrape(self, days: int = 3) -> List[Dict]:
+    def scrape(self, days: int = DEFAULT_SCRAPE_DAYS) -> List[Dict]:
         """
         Scrape news from the source
         Must return a list of dictionaries with at least:

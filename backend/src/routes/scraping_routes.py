@@ -7,6 +7,7 @@ import logging
 from src.services.scraping_service import scraping_service
 from src.services.geocoding_service import geocoding_service
 from src.services.nlp_service import nlp_service
+from src.config import DEFAULT_SCRAPE_DAYS
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/api/scrape", tags=["scraping"])
 @router.post("/", response_model=Dict)
 async def trigger_scraping(
     background_tasks: BackgroundTasks,
-    days: int = Query(3, ge=1, le=30, description="Number of days to scrape"),
+    days: int = Query(DEFAULT_SCRAPE_DAYS, ge=1, le=30, description="Number of days to scrape"),
     background: bool = Query(False, description="Run in background")
 ):
     """

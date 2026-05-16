@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     # Scraping
     SCRAPING_SCHEDULE_HOURS: int = 24
+    DEFAULT_SCRAPE_DAYS: int = 3
+    SCRAPING_RUN_ON_STARTUP: bool = False
     SIMILARITY_THRESHOLD: float = 0.90
 
     # Server
@@ -30,6 +32,13 @@ class Settings(BaseSettings):
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+
+    # Stadium (Kocaelispor)
+    STADIUM_NAME: str = "Kocaeli Stadyumu"
+    STADIUM_LAT: float = 40.7750844
+    STADIUM_LNG: float = 30.017023
+    STADIUM_DISTRICT: str = "İzmit"
+    DEFAULT_STADIUM_RADIUS_KM: float = 1.0
 
     class Config:
         env_file = str(_ENV_FILE)
@@ -85,6 +94,17 @@ NEWS_TYPES = {
         "konser", "festival", "tiyatro", "sergi", "müze",
         "etkinlik", "sanat", "fuar", "şenlik",
         "galeri", "seminer", "konferans", "kültür merkezi"
+    ],
+    "Spor": [
+        "kocaelispor", "kocaeli spor", "stadyum", "stad",
+        "maç", "karşılaşma", "müsabaka", "tribün", "taraftar",
+        "gol", "transfer", "teknik direktör", "puan durumu",
+        "skor", "hakem", "uefa", "fifa", "lig", "u21",
+        "spor", "antrenör", "antrenor", "kulübü", "kulubu",
+        "yüzme", "yuzme", "turnuva", "şampiyona", "sampiyona",
+        "milli sporcu", "milli antrenör", "milli antrenor",
+        "kickbox", "kick boks", "boks", "güreş", "gures",
+        "basketbol", "voleybol", "futbol"
     ]
 }
 
@@ -98,8 +118,28 @@ NEWS_TYPE_PRIORITY = [
     "Trafik Kazası",
     "Elektrik Kesintisi",
     "Hırsızlık",
-    "Kültürel Etkinlikler"
+    "Kültürel Etkinlikler",
+    "Spor"
 ]
+
+# Kocaelispor stadyumu (Yıldız Entegre Kocaeli Stadyumu) çevresi için varsayılan merkez
+KOCAELISPOR_STADIUM = {
+    "name": settings.STADIUM_NAME,
+    "lat": settings.STADIUM_LAT,
+    "lng": settings.STADIUM_LNG,
+    "district": settings.STADIUM_DISTRICT
+}
+
+DEFAULT_STADIUM_RADIUS_KM = settings.DEFAULT_STADIUM_RADIUS_KM
+DEFAULT_SCRAPE_DAYS = settings.DEFAULT_SCRAPE_DAYS
+
+# Spor dışı, konumu belirsiz yerel haberler için varsayılan fallback (İzmit merkez)
+IZMIT_FALLBACK_CENTER = {
+    "name": "İzmit Merkez",
+    "lat": 40.7654,
+    "lng": 29.9408,
+    "district": "İzmit"
+}
 
 # Haber kaynakları
 NEWS_SOURCES = [

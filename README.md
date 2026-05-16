@@ -12,6 +12,7 @@ Kocaeli yerel haber sitelerinden belirlenen haber türlerine ait haberlerin web 
 - ⚡ Elektrik Kesintisi
 - 🚨 Hırsızlık
 - 🎭 Kültürel Etkinlikler
+- ⚽ Spor (Kocaelispor odaklı)
 
 ### Haber Kaynakları
 - Çağdaş Kocaeli (cagdaskocaeli.com.tr)
@@ -76,6 +77,11 @@ python main.py
 
 Backend: http://localhost:8000
 
+Alternatif (Windows, tek komut):
+```powershell
+./run.ps1
+```
+
 ### Frontend Kurulumu
 
 1. **Paketleri yükle:**
@@ -134,10 +140,17 @@ GET /health
 GET /api/news?news_type=Trafik Kazası&district=Gebze&start_date=2024-01-01
 ```
 
+### Stadyum Çevresi Spor Haberleri
+```
+GET /api/news?news_type=Spor&around_stadium=true&radius_km=3
+```
+
 ### Scraping Tetikle
 ```
 POST /api/scrape?days=3
 ```
+
+Not: `days` parametresi opsiyoneldir. Varsayılan değer 3'tür, 1-30 aralığında farklı bir değer gönderilebilir.
 
 ### Haber Detayı
 ```
@@ -195,8 +208,23 @@ kentsel-haber-scraper/
 ✅ Google Maps üzerinde görselleştirme
 ✅ Haber türüne göre farklı marker'lar
 ✅ Filtreleme (tür, ilçe, tarih)
+✅ Kocaelispor stadyumu çevresinde dairesel filtreleme
 ✅ MongoDB ile veri saklama
 ✅ REST API
+
+## ⚙️ Stadyum Ayarları (.env)
+
+Backend `.env` dosyasından stadyum merkezi yönetilebilir:
+
+```env
+STADIUM_NAME=Kocaeli Stadyumu
+STADIUM_LAT=40.7820
+STADIUM_LNG=30.0120
+STADIUM_DISTRICT=İzmit
+DEFAULT_STADIUM_RADIUS_KM=3.0
+```
+
+Bu değerler frontend filtre paneline `/api/news/meta` üzerinden otomatik taşınır.
 
 ## 👥 Geliştirici
 

@@ -5,6 +5,7 @@ from typing import List, Dict
 import asyncio
 import logging
 from datetime import datetime, timedelta
+import re
 from src.scrapers import (
     CagdasKocaeliScraper,
     OzgurKocaeliScraper,
@@ -17,7 +18,7 @@ from src.services.geocoding_service import geocoding_service
 from src.services.similarity_service import similarity_service
 from src.utils.database import db
 from src.models import NewsArticle, NewsSource, Location
-from src.config import REQUIRED_NEWS_TYPES
+from src.config import REQUIRED_NEWS_TYPES, KOCAELISPOR_STADIUM, IZMIT_FALLBACK_CENTER, DEFAULT_SCRAPE_DAYS
 
 try:
     import numpy as np
@@ -41,7 +42,7 @@ class ScrapingService:
         self.embedding_candidate_limit = 150
         self.embedding_days_window = 7
 
-    async def scrape_all_sources(self, days: int = 3) -> Dict:
+    async def scrape_all_sources(self, days: int = DEFAULT_SCRAPE_DAYS) -> Dict:
         """
         Tüm kaynaklardan haber kazır.
         Döndürür: Kazanılan haberlerle ilgili istatistikler.
@@ -123,16 +124,33 @@ class ScrapingService:
                 return "skipped_unclassified"
 
             # Extract location
+            full_text = f"{article_data['title']} {cleaned_content}"
+            full_text_lower = full_text.lower()
             location_text = nlp_service.extract_location(
-                f"{article_data['title']} {cleaned_content}"
+                full_text
             )
+
+            is_kocaelispor_news = bool(re.search(r"kocaeli\s*spor", full_text_lower))
+            used_stadium_fallback = False
+            used_izmit_fallback = False
+
+            # Spor haberleri için konum politikası:
+            # - Spor haberi ise doğrudan stadyum merkezi
+            # - Spor dışı haberde konum yoksa/generik "Kocaeli" ise İzmit merkez fallback
+            if news_type == "Spor":
+                location_text = KOCAELISPOR_STADIUM["name"]
+                used_stadium_fallback = True
+            else:
+                generic_city_location = isinstance(location_text, str) and location_text.strip().lower() == "kocaeli"
+                if location_text is None or generic_city_location:
+                    location_text = IZMIT_FALLBACK_CENTER["name"]
+                    used_izmit_fallback = True
 
             # Kocaeli ile ilgisi olmayan ulusal haberleri filtrele:
             # konum bulunamadıysa ve metinde hiçbir ilçe adı / "Kocaeli" geçmiyorsa atla
             if location_text is None:
                 from src.config import KOCAELI_DISTRICTS
                 import re as _re
-                full_text = f"{article_data['title']} {cleaned_content}"
                 has_kocaeli = bool(_re.search(r'(?<![a-zA-ZçğışöüÇĞİÖŞÜ])kocaeli', full_text, _re.IGNORECASE))
                 has_district = any(
                     bool(_re.search(rf'(?<![a-zA-ZçğışöüÇĞİÖŞÜ]){_re.escape(d)}', full_text, _re.IGNORECASE))
@@ -150,6 +168,27 @@ class ScrapingService:
                 coordinates = geocoding_service.geocode_location(location_text)
 
                 # Proje kuralı: Geocoding başarısız olursa kayıt işlenmez
+                if coordinates is None:
+                    if news_type == "Spor" and used_stadium_fallback:
+                        coordinates = {
+                            "lat": KOCAELISPOR_STADIUM["lat"],
+                            "lng": KOCAELISPOR_STADIUM["lng"],
+                        }
+                        district = KOCAELISPOR_STADIUM["district"]
+                    elif news_type != "Spor":
+                        # Spor dışı haberde koordinat üretilemediyse dağınık nokta yerine
+                        # her zaman İzmit merkez fallback kullan.
+                        coordinates = {
+                            "lat": IZMIT_FALLBACK_CENTER["lat"],
+                            "lng": IZMIT_FALLBACK_CENTER["lng"],
+                        }
+                        district = IZMIT_FALLBACK_CENTER["district"]
+                        location_text = IZMIT_FALLBACK_CENTER["name"]
+                        used_izmit_fallback = True
+                    else:
+                        logger.info(f"[SKIP] Geocoding failed: {article_data['title'][:50]}...")
+                        return "skipped_geocoding"
+
                 if coordinates is None:
                     logger.info(f"[SKIP] Geocoding failed: {article_data['title'][:50]}...")
                     return "skipped_geocoding"
@@ -170,6 +209,9 @@ class ScrapingService:
                         if _re.search(pattern, full_text, _re.IGNORECASE):
                             district = dist
                             break
+
+                if not district and used_izmit_fallback:
+                    district = IZMIT_FALLBACK_CENTER["district"]
 
             # Generate hash for duplicate detection
             similarity_hash = similarity_service.generate_hash(

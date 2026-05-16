@@ -17,16 +17,23 @@ logger = logging.getLogger(__name__)
 
 
 async def _scheduled_scraping():
-    """Run scraping automatically at startup and then every SCRAPING_SCHEDULE_HOURS hours."""
+    """Run scraping periodically; optional immediate run on startup."""
     from src.services.scraping_service import scraping_service
 
-    # Wait a few seconds for the app to finish starting up before the first run
-    await asyncio.sleep(10)
+    if settings.SCRAPING_RUN_ON_STARTUP:
+        # Wait a few seconds for the app to finish starting up before the first run
+        await asyncio.sleep(10)
+    else:
+        interval_seconds = settings.SCRAPING_SCHEDULE_HOURS * 3600
+        logger.info(
+            f"[SCHEDULER] Startup run disabled. First automatic run in {settings.SCRAPING_SCHEDULE_HOURS} hours."
+        )
+        await asyncio.sleep(interval_seconds)
 
     while True:
         try:
             logger.info("[SCHEDULER] Starting automatic scraping run...")
-            result = await scraping_service.scrape_all_sources(days=3)
+            result = await scraping_service.scrape_all_sources(days=settings.DEFAULT_SCRAPE_DAYS)
             logger.info(
                 f"[SCHEDULER] Done — saved: {result['total_saved']}, "
                 f"duplicates: {result['total_duplicates']}, "
