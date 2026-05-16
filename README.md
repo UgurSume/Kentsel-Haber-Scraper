@@ -232,4 +232,4 @@ Bu değerler frontend filtre paneline `/api/news/meta` üzerinden otomatik taş�
 
 ## 📄 Lisans
 
-Bu proje Kocaeli Üniversitesi Bilgisayar Programlama Lab Projesi kapsamında geliştirilmiştir.
+Bu proje Kocaeli Üniversitesi Bilgisayar Mühendisliği ve Laboratuvarı Projesi kapsamında geliştirilmiştir.
