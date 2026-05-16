@@ -61,15 +61,13 @@ class ScrapingService:
             try:
                 logger.info(f"[SCRAPING] {scraper.source_name}...")
 
-                # Selenium kullanan kazıyıcılar engelleme yapar; event loop'u dondurmamak
-                # için thread pool'da çalıştırılıyor
+
                 loop = asyncio.get_event_loop()
                 articles = await loop.run_in_executor(None, lambda s=scraper: s.scrape(days=days))
                 total_scraped += len(articles)
 
                 logger.info(f"[INFO] Found {len(articles)} articles from {scraper.source_name}")
 
-                # Her makaleyi işle ve veritabanına kaydet
                 for article_data in articles:
                     try:
                         status = await self.process_and_save_article(article_data, scraper.source_name)
@@ -110,10 +108,10 @@ class ScrapingService:
         Döndürür: saved | duplicate | skipped_unclassified | skipped_geocoding
         """
         try:
-            # İçeriği temizle (HTML etiketlerini çıkar)
+
             cleaned_content = nlp_service.clean_content(article_data['content'])
 
-            # Haber türünü sınıflandır
+
             news_type, keywords = nlp_service.classify_news(
                 article_data['title'],
                 cleaned_content
